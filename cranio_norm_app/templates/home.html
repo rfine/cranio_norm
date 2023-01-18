@@ -1,0 +1,16 @@
+<html>
+    <head>
+
+    </head>
+    <body>
+        <!-- enctype is needed since we are uploading large file type -->
+        <form action="/cranio/file_upload/" method="post" enctype="multipart/form-data">
+            <!-- needed to bypass security -->
+            {% csrf_token %}
+            <label for="file-input">Files: </label>
+            <input id="file-input" type="file" name="file-input" multiple>
+            <input type="submit">
+        </form>
+
+    </body>
+</html>
