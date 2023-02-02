@@ -1,6 +1,6 @@
+{% load static %}
 <html>
     <head>
-
     </head>
     <body>
         <!-- enctype is needed since we are uploading large file type -->
@@ -8,7 +8,11 @@
             <!-- needed to bypass security -->
             {% csrf_token %}
             <label for="file-input">Files: </label>
-            <input id="file-input" type="file" name="file-input" multiple>
+            <input id="file-input" type="file" name="file-input" accept=".stl" multiple required>
+            <label for="theta-value">Theta Value:</label>
+            <input id="theta-value" type="number" step="any" name="theta-value" multiple required>
+            <label for="phi-value">Phi Value:</label>
+            <input id="phi-value" type="number" step="any" name="phi-value" multiple required>
             <input type="submit">
         </form>
 
