@@ -5,6 +5,8 @@ from django.core.exceptions import ValidationError
 
 from .forms import HomeForm
 from .file_service import FileService
+import json
+
 
 
 def home(request):
@@ -37,8 +39,4 @@ def home(request):
     return render(request, 'home.html', {'form': form})
 
 def skull_input(request, point_cloud_array):
-    context = {
-        point_cloud_array: point_cloud_array
-    }
-    # point_cloud_array = request.session.get('point_cloud_array')
-    return render(request, 'skull_input.html', context = context)
+    return render(request, 'skull_input.html', {'data': json.dumps(point_cloud_array)})
