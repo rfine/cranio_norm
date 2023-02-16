@@ -25,7 +25,9 @@ def home(request):
                 for file in files:
                     file_service = FileService(file)
                     point_cloud_array, point_cloud_list = file_service.convertFile()
-                    return redirect('skull_input', point_cloud_array = point_cloud_array)
+                    # redirect with session
+                    request.session['data'] = point_cloud_list
+                    return redirect('skull_input')
                     # send back point array to new page 
             # process the data in form.cleaned_data as required
             # ...
@@ -38,5 +40,6 @@ def home(request):
 
     return render(request, 'home.html', {'form': form})
 
-def skull_input(request, point_cloud_array):
-    return render(request, 'skull_input.html', {'data': json.dumps(point_cloud_array)})
+def skull_input(request):
+    json_obj = request.session['data']
+    return render(request, 'skull_input.html', {'data': json_obj})

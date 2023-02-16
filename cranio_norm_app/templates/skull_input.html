@@ -3,14 +3,15 @@
     <head>
         <!-- creating a global variable to access data in seperate JS file -->
         <script> var data = "{{data|escapejs}}" </script>
-        <script src="{% static '/jquery-3.6.3.min.js' %}"></script>
-        <script src="{% static '/skull_input.js' %}"></script>        
+        <script src="{% static '/lib/jquery-3.6.3.min.js' %}"></script>
+        <script src="{% static '/lib/three.js' %}"></script>     
+        <script src="{% static '/skull_input.js' %}"></script>       
     </head>
     <body>
         <h1>we here </h1>
         {% csrf_token %}
         <button onclick="myFunction()">TEst</button>
-        <h3>{{data|escapejs}}</h3>
+        <canvas class="s_1"></canvas>
     </body>
 </html>
 
