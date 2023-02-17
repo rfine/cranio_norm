@@ -1,0 +1,15 @@
+{% load static %}
+<html>
+    <head>
+    </head>
+    <body>
+        <!-- enctype is needed since we are uploading large file type -->
+        <form action="/cranio/home/" method="post" enctype="multipart/form-data">
+            <!-- needed to bypass security -->
+            {% csrf_token %}
+            {{form}}
+            <input type="submit">
+        </form>
+
+    </body>
+</html>
