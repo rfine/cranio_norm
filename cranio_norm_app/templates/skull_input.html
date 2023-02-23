@@ -2,6 +2,7 @@
 <html>
     <head>
         <!-- creating a global variable to access data in seperate JS file -->
+        <!-- WARNING!! adding dom elements will create an offset on the canvas -->
         <script> var data = "{{data|escapejs}}" </script>
         <script src="{% static '/lib/jquery-3.6.3.min.js' %}"></script>
         <script src="{% static '/lib/three.js' %}"></script>     
@@ -9,7 +10,7 @@
         <script src="{% static '/skull_input.js' %}"></script>       
     </head>
     <body>
-        <h1>we here </h1>
+    
         {% csrf_token %}
     </body>
 </html>
