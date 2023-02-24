@@ -1,4 +1,5 @@
-import Stack from "./Stack.js";
+import Stack from "./stack.js";
+import { ANATOMICAL_NAMES } from "./constants.js";
 
 const renderWidth = window.innerWidth * 0.7;
 const renderHeight = window.innerHeight * 0.7;
@@ -43,6 +44,7 @@ let mouse = new THREE.Vector2();
 const pointStack = new Stack();
 
 $(document).ready(function () {
+  console.log(ANATOMICAL_NAMES[0]);
   window.addEventListener("resize", onWindowResize, false);
   window.addEventListener("keypress", onKeyPress, false);
   window.addEventListener("click", onClick, false);
@@ -86,7 +88,9 @@ function onKeyPress(e) {
     if (!pointStack.isEmpty()) {
       const sphereRemove = pointStack.pop();
       scene.remove(sphereRemove);
-      console.log(sphereRemove.uuid);
+      // update the UI
+      const promptElement = document.getElementById("point_cur");
+      promptElement.innerHTML = ANATOMICAL_NAMES[pointStack.getSize()];
     }
   }
 }
@@ -108,7 +112,7 @@ function onClick(e) {
 
     rayCaster.setFromCamera(mouse, camera);
     const intersects = rayCaster.intersectObject(particles, false);
-    if (intersects.length > 0) {
+    if (intersects.length > 0 && pointStack.getSize() < 4) {
       const idx = intersects[0].index;
       const sphereGeo = new THREE.SphereGeometry(3, 30, 30);
       const sphereMat = new THREE.MeshBasicMaterial({ color: 0xffff00 });
@@ -121,6 +125,9 @@ function onClick(e) {
       sphereMesh.position.copy(intersectionPoint);
       pointStack.push(sphereMesh);
       scene.add(sphereMesh);
+      // update the UI with js
+      const promptElement = document.getElementById("point_cur");
+      promptElement.innerHTML = ANATOMICAL_NAMES[pointStack.getSize()];
     }
   }
 }
