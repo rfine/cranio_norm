@@ -1,16 +1,20 @@
 import Stack from "./Stack.js";
 
+const renderWidth = window.innerWidth * 0.7;
+const renderHeight = window.innerHeight * 0.7;
+
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(
   75,
-  window.innerWidth / window.innerHeight,
+  renderWidth / renderHeight,
   0.1,
   1000
 );
 camera.position.x = 200;
 
 const renderer = new THREE.WebGLRenderer();
-renderer.setSize(window.innerWidth, window.innerHeight);
+
+renderer.setSize(renderWidth, renderHeight);
 
 const geometryPoints = new THREE.BufferGeometry();
 
@@ -88,17 +92,20 @@ function onKeyPress(e) {
 }
 
 function onWindowResize() {
-  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.aspect = renderWidth / renderHeight;
   camera.updateProjectionMatrix();
-  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setSize(renderWidth, renderHeight);
   animate();
 }
 
 function onClick(e) {
   if (e.shiftKey) {
     e.preventDefault();
-    mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
-    mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+
+    const offset = $("canvas").offset();
+    mouse.x = ((e.clientX - offset.left) / renderWidth) * 2 - 1;
+    mouse.y = -((e.clientY - offset.top) / renderHeight) * 2 + 1;
+
     rayCaster.setFromCamera(mouse, camera);
     const intersects = rayCaster.intersectObject(particles, false);
     if (intersects.length > 0) {
