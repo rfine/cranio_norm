@@ -36,24 +36,33 @@ const light = new THREE.AmbientLight(0x404040);
 // point selection variables
 // emit a ray from the camera to the user cursor
 const rayCaster = new THREE.Raycaster();
-// needs to be less than or equal to particle size for more precise selection
+// value less than or equal to particle size
 rayCaster.params.Points.threshold = 0.2;
 // Normalized x, y coordinates of the user's mouse cursor in respect to the window
 let mouse = new THREE.Vector2();
 
-const pointStack = new Stack();
+const pointsList = [];
+
+let curIndex = 0;
 
 $(document).ready(function () {
-  console.log(ANATOMICAL_NAMES[0]);
   window.addEventListener("resize", onWindowResize, false);
   window.addEventListener("keypress", onKeyPress, false);
-  window.addEventListener("click", onClick, false);
+  window.addEventListener("click", onClickCanvas, false);
+
+  const btnNext = document.getElementById("nav-next-btn");
+  btnNext.addEventListener("click", onClickNext, false);
+  const btnPrev = document.getElementById("nav-prev-btn");
+  btnPrev.addEventListener("click", onClickPrev, false);
+  btnPrev.disabled = true;
 
   rawData = JSON.parse(data);
+  createPointsList(rawData.length);
+  // TODO need to update to have more control on where canvas is within the dom
   document.body.appendChild(renderer.domElement);
-
-  processRawData();
   scene.add(light);
+
+  processRawData(rawData[curIndex]);
   animate();
 });
 
@@ -62,12 +71,18 @@ function animate() {
   requestAnimationFrame(animate);
   renderer.render(scene, camera);
 }
+function createPointsList(size) {
+  for (let i = 0; i < size; i++) {
+    pointsList.push([]);
+  }
+}
 
-function processRawData() {
-  for (let i = 0; i < rawData.length; i++) {
-    positionPoints.push(rawData[i][0], rawData[i][1], rawData[i][2]);
-    let color = new THREE.Color();
-    color.setRGB(0.5, 0.92, 0.1);
+function processRawData(curData) {
+  positionPoints = [];
+  colors = [];
+  for (let i = 0; i < curData.length; i++) {
+    positionPoints.push(curData[i][0], curData[i][1], curData[i][2]);
+    const color = new THREE.Color(0.5, 0.92, 0.1);
     colors.push(color.r, color.g, color.b);
   }
   geometryPoints.setAttribute(
@@ -85,12 +100,10 @@ function processRawData() {
 // windowEventListener impl
 function onKeyPress(e) {
   if (e.key == "r") {
-    if (!pointStack.isEmpty()) {
-      const sphereRemove = pointStack.pop();
+    if (pointsList[curIndex].length > 0) {
+      const sphereRemove = pointsList[curIndex].pop();
       scene.remove(sphereRemove);
-      // update the UI
-      const promptElement = document.getElementById("point_cur");
-      promptElement.innerHTML = ANATOMICAL_NAMES[pointStack.getSize()];
+      updateText();
     }
   }
 }
@@ -102,7 +115,7 @@ function onWindowResize() {
   animate();
 }
 
-function onClick(e) {
+function onClickCanvas(e) {
   if (e.shiftKey) {
     e.preventDefault();
 
@@ -112,7 +125,7 @@ function onClick(e) {
 
     rayCaster.setFromCamera(mouse, camera);
     const intersects = rayCaster.intersectObject(particles, false);
-    if (intersects.length > 0 && pointStack.getSize() < 4) {
+    if (intersects.length > 0 && pointsList[curIndex].length < 4) {
       const idx = intersects[0].index;
       const sphereGeo = new THREE.SphereGeometry(3, 30, 30);
       const sphereMat = new THREE.MeshBasicMaterial({ color: 0xffff00 });
@@ -123,11 +136,60 @@ function onClick(e) {
         geometryPoints.attributes.position.getZ(idx)
       );
       sphereMesh.position.copy(intersectionPoint);
-      pointStack.push(sphereMesh);
+      pointsList[curIndex].push(sphereMesh);
       scene.add(sphereMesh);
       // update the UI with js
-      const promptElement = document.getElementById("point_cur");
-      promptElement.innerHTML = ANATOMICAL_NAMES[pointStack.getSize()];
+      updateText();
     }
   }
+}
+
+function onClickNext() {
+  removeScenePoints();
+  curIndex++;
+  processRawData(rawData[curIndex]);
+  addScenePoints();
+  updateText();
+
+  if (curIndex >= rawData.length - 1) {
+    const btnNext = document.getElementById("nav-next-btn");
+    btnNext.disabled = true;
+  }
+  const btnPrev = document.getElementById("nav-prev-btn");
+  btnPrev.disabled = false;
+}
+
+function onClickPrev() {
+  removeScenePoints();
+  curIndex--;
+  processRawData(rawData[curIndex]);
+  addScenePoints();
+  updateText();
+
+  if (curIndex <= 0) {
+    const btnPrev = document.getElementById("nav-prev-btn");
+    btnPrev.disabled = true;
+  }
+
+  const btnNext = document.getElementById("nav-next-btn");
+  btnNext.disabled = false;
+}
+
+function removeScenePoints() {
+  for (let i = 0; i < pointsList[curIndex].length; i++) {
+    const sphereRemove = pointsList[curIndex][i];
+    scene.remove(sphereRemove);
+  }
+}
+
+function addScenePoints() {
+  for (let i = 0; i < pointsList[curIndex].length; i++) {
+    const sphereRemove = pointsList[curIndex][i];
+    scene.add(sphereRemove);
+  }
+}
+
+function updateText() {
+  const promptElement = document.getElementById("point-cur");
+  promptElement.innerHTML = ANATOMICAL_NAMES[pointsList[curIndex].length];
 }
