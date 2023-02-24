@@ -1,4 +1,3 @@
-import Stack from "./stack.js";
 import { ANATOMICAL_NAMES } from "./constants.js";
 
 const renderWidth = window.innerWidth * 0.7;
