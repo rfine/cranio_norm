@@ -41,31 +41,8 @@ const pointStack = new Stack();
 $(document).ready(function () {
   window.addEventListener("resize", onWindowResize, false);
   window.addEventListener("keypress", onKeyPress, false);
+  window.addEventListener("click", onClick, false);
 
-  // onclick create the sphere
-  window.addEventListener("click", function (e) {
-    if (e.shiftKey) {
-      e.preventDefault();
-      mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
-      mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
-      rayCaster.setFromCamera(mouse, camera);
-      const intersects = rayCaster.intersectObject(particles, false);
-      if (intersects.length > 0) {
-        const idx = intersects[0].index;
-        const sphereGeo = new THREE.SphereGeometry(3, 30, 30);
-        const sphereMat = new THREE.MeshBasicMaterial({ color: 0xffff00 });
-        const sphereMesh = new THREE.Mesh(sphereGeo, sphereMat);
-        const intersectionPoint = new THREE.Vector3(
-          geometryPoints.attributes.position.getX(idx),
-          geometryPoints.attributes.position.getY(idx),
-          geometryPoints.attributes.position.getZ(idx)
-        );
-        sphereMesh.position.copy(intersectionPoint);
-        pointStack.push(sphereMesh);
-        scene.add(sphereMesh);
-      }
-    }
-  });
   rawData = JSON.parse(data);
   document.body.appendChild(renderer.domElement);
 
@@ -73,23 +50,6 @@ $(document).ready(function () {
   scene.add(light);
   animate();
 });
-
-function onKeyPress(e) {
-  if (e.key == "r") {
-    if (!pointStack.isEmpty()) {
-      const sphereRemove = pointStack.pop();
-      scene.remove(sphereRemove);
-      console.log(sphereRemove.uuid);
-    }
-  }
-}
-
-function onWindowResize() {
-  camera.aspect = window.innerWidth / window.innerHeight;
-  camera.updateProjectionMatrix();
-  renderer.setSize(window.innerWidth, window.innerHeight);
-  animate();
-}
 
 function animate() {
   controls.update();
@@ -114,4 +74,46 @@ function processRawData() {
   );
   particles = new THREE.Points(geometryPoints, particleMaterial);
   scene.add(particles);
+}
+
+// windowEventListener impl
+function onKeyPress(e) {
+  if (e.key == "r") {
+    if (!pointStack.isEmpty()) {
+      const sphereRemove = pointStack.pop();
+      scene.remove(sphereRemove);
+      console.log(sphereRemove.uuid);
+    }
+  }
+}
+
+function onWindowResize() {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  animate();
+}
+
+function onClick(e) {
+  if (e.shiftKey) {
+    e.preventDefault();
+    mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+    mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+    rayCaster.setFromCamera(mouse, camera);
+    const intersects = rayCaster.intersectObject(particles, false);
+    if (intersects.length > 0) {
+      const idx = intersects[0].index;
+      const sphereGeo = new THREE.SphereGeometry(3, 30, 30);
+      const sphereMat = new THREE.MeshBasicMaterial({ color: 0xffff00 });
+      const sphereMesh = new THREE.Mesh(sphereGeo, sphereMat);
+      const intersectionPoint = new THREE.Vector3(
+        geometryPoints.attributes.position.getX(idx),
+        geometryPoints.attributes.position.getY(idx),
+        geometryPoints.attributes.position.getZ(idx)
+      );
+      sphereMesh.position.copy(intersectionPoint);
+      pointStack.push(sphereMesh);
+      scene.add(sphereMesh);
+    }
+  }
 }
