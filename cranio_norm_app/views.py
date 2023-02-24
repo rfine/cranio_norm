@@ -7,8 +7,6 @@ from .forms import HomeForm
 from .file_service import FileService
 import json
 
-
-
 def home(request):
     # if this is a POST request we need to process the form data
     if request.method == 'POST':
@@ -22,15 +20,15 @@ def home(request):
                 return render(request, 'home.html', {'form': form})
             else:
                 # need to process for all files before redirecting... 
+                data = []
                 for file in files:
                     file_service = FileService(file)
                     point_cloud_array, point_cloud_list = file_service.convertFile()
+                    data.append(point_cloud_list)
                     # redirect with session
-                    request.session['data'] = point_cloud_list
-                    return redirect('skull_input')
-                    # send back point array to new page 
+                request.session['data'] = data
+                return redirect('skull_input')
             # process the data in form.cleaned_data as required
-            # ...
             # redirect to a new URL:
             
 

@@ -7,11 +7,16 @@
         <script src="{% static '/lib/jquery-3.6.3.min.js' %}"></script>
         <script src="{% static '/lib/three.js' %}"></script>     
         <script src="{% static '/lib/OrbitControls.js' %}"></script>     
-        <script type="module" src="{% static '/skull_input.js' %}"></script>       
+        <script type="module" src="{% static '/skull_input.js' %}"></script>      
     </head>
     <body>
         <h1>Anatomical Point Section</h1>
-        <h2 id="point_cur">Select Right Porion Point</h2>
+        <div>
+            <button id="nav-prev-btn">Previous</button>
+            <h2 id="point-cur">Select Right Porion Point</h2>
+            <button id="nav-next-btn">Next</button>
+        </div>
+        
         {% csrf_token %}
     </body>
 </html>
