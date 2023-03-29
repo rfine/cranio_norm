@@ -1,4 +1,4 @@
-import { ANATOMICAL_NAMES } from "./constants.js";
+import { ANATOMICAL_NAMES, ANATOMICAL_POINT_COUNT } from "./constants.js";
 
 const renderWidth = window.innerWidth * 0.7;
 const renderHeight = window.innerHeight * 0.7;
@@ -41,6 +41,7 @@ rayCaster.params.Points.threshold = 0.2;
 let mouse = new THREE.Vector2();
 
 const pointsList = [];
+let indexList = [];
 
 let curIndex = 0;
 
@@ -54,6 +55,9 @@ $(document).ready(function () {
   const btnPrev = document.getElementById("nav-prev-btn");
   btnPrev.addEventListener("click", onClickPrev, false);
   btnPrev.disabled = true;
+
+  const subBtn = document.getElementById("submit-btn");
+  subBtn.addEventListener("click", onClickSubmit, false);
 
   rawData = JSON.parse(data);
   createPointsList(rawData.length);
@@ -73,7 +77,18 @@ function animate() {
 function createPointsList(size) {
   for (let i = 0; i < size; i++) {
     pointsList.push([]);
+    indexList.push([]);
   }
+}
+
+function isValidCheck() {
+  for (let i = 0; i < pointsList.length; i++) {
+    if (pointsList[i].length != ANATOMICAL_POINT_COUNT) {
+      document.getElementById("submit-btn").disabled = true;
+      return;
+    }
+  }
+  document.getElementById("submit-btn").disabled = false;
 }
 
 function processRawData(curData) {
@@ -125,6 +140,7 @@ function onClickCanvas(e) {
     rayCaster.setFromCamera(mouse, camera);
     const intersects = rayCaster.intersectObject(particles, false);
     if (intersects.length > 0 && pointsList[curIndex].length < 4) {
+      // TODO is this index matching that of the data?
       const idx = intersects[0].index;
       const sphereGeo = new THREE.SphereGeometry(3, 30, 30);
       const sphereMat = new THREE.MeshBasicMaterial({ color: 0xffff00 });
@@ -136,9 +152,11 @@ function onClickCanvas(e) {
       );
       sphereMesh.position.copy(intersectionPoint);
       pointsList[curIndex].push(sphereMesh);
+      indexList[curIndex].push(idx);
       scene.add(sphereMesh);
       // update the UI with js
       updateText();
+      isValidCheck();
     }
   }
 }
@@ -174,6 +192,35 @@ function onClickPrev() {
   btnNext.disabled = false;
 }
 
+function onClickSubmit() {
+  let form = document.getElementById("form-points");
+
+  let ret = [];
+  for (let i = 0; i < pointsList.length; i++) {
+    const skullPoints = pointsList[i];
+    ret[i] = [];
+    for (let j = 0; j < skullPoints.length; j++) {
+      console.log(indexList[i][j]);
+      console.log(pointsList[i][j].position);
+      ret[i].push(indexList[i][j]);
+    }
+  }
+
+  console.log(ret);
+  const retJSON = JSON.stringify(ret);
+
+  let input = document.createElement("input");
+  input.setAttribute("name", "index");
+  input.setAttribute("value", retJSON);
+  input.setAttribute("type", "hidden");
+  form.appendChild(input);
+  // const formData = new FormData(form);
+  // for (var pair of formData.entries()) {
+  //   console.log(pair[0] + ", " + pair[1]);
+  // }
+  form.submit();
+}
+
 function removeScenePoints() {
   for (let i = 0; i < pointsList[curIndex].length; i++) {
     const sphereRemove = pointsList[curIndex][i];
@@ -183,9 +230,10 @@ function removeScenePoints() {
 
 function addScenePoints() {
   for (let i = 0; i < pointsList[curIndex].length; i++) {
-    const sphereRemove = pointsList[curIndex][i];
-    scene.add(sphereRemove);
+    const sphereAdd = pointsList[curIndex][i];
+    scene.add(sphereAdd);
   }
+  isValidCheck();
 }
 
 function updateText() {

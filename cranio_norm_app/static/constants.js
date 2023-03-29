@@ -5,3 +5,5 @@ export const ANATOMICAL_NAMES = [
   "Select Basion Point",
   "Point Selection Complete",
 ];
+
+export const ANATOMICAL_POINT_COUNT = 4;
