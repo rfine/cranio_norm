@@ -10,6 +10,9 @@ from .constants import *
 import numpy as np
 import math
 import aspose.threed as a3d
+import time 
+from plyfile import PlyData
+
 
 def home(request):
     # if this is a POST request we need to process the form data
@@ -26,10 +29,12 @@ def home(request):
                 data = []
                 for file in files:
                     file_service = FileService(file)
-                    point_cloud_array, point_cloud_list = file_service.convertFile()
-                    data.append(point_cloud_list)
+                    file_name = file_service.convertSTLToPLY()
+                    data.append(file_name)
                     # redirect with session
-                request.session['point_cloud_list'] = data
+                start_time = time.time()
+                request.session['ply_file_names'] = data
+                print("--- %s create session ---" % (time.time() - start_time))
                 return redirect('skull_input')
             
 
@@ -40,7 +45,9 @@ def home(request):
     return render(request, 'home.html', {'form': form})
 
 def skull_input(request):
-    json_obj = request.session['point_cloud_list']
+    start_time = time.time()
+    json_obj = json.dumps(request.session['ply_file_names'])
+    print("--- %s skull_input ---" % (time.time() - start_time))
     return render(request, 'skull_input.html', {'data': json_obj})
 
 
@@ -63,15 +70,25 @@ def fixNaseon(trans_rotate_list, angle):
         data[2] = z
     return(trans_rotate_list)
 
-
+# TODO get the data directly with the index with PLYDATA
 def points(request):
     skull_list = json.loads(request.POST.get('index'))
-    point_cloud_list = request.session['point_cloud_list']
-    for index, skull in enumerate(skull_list):
+    file_names = request.session['ply_file_names']
+    for index, file_name in enumerate(file_names):
+        # open 
+        plydata = PlyData.read("./cranio_norm_app/static/ply/"+file_name)
+        right_porion_xyz = np.asarray(plydata["vertex"].data[skull_list[index][RIGHT_PORION]]).tolist()[:3]
+        left_porion_xyz = np.asarray(plydata["vertex"].data[skull_list[index][LEFT_PORION]]).tolist()[:3]
+        naseon_xyz = np.asarray(plydata["vertex"].data[skull_list[index][NASEON]]).tolist()[:3]
+        basion_xyz = np.asarray(plydata["vertex"].data[skull_list[index][BASION]]).tolist()[:3]
 
-        print(point_cloud_list[index][skull[RIGHT_PORION]])
-        right_porion_xyz = point_cloud_list[index][skull[RIGHT_PORION]]
-        left_porion_xyz = point_cloud_list[index][skull[LEFT_PORION]]
-        naseon_xyz = point_cloud_list[index][skull[NASEON]]
-        basion_xyz = point_cloud_list[index][skull[BASION]]
+    #     point_cloud_array = np.array([[x, y, z]
+    #                                   for x, y, z, nx, ny, nz in plydata["vertex"].data])
+    #     point_cloud_list = point_cloud_array.tolist()
+
+        # print(point_cloud_list[index][skull[RIGHT_PORION]])
+        # right_porion_xyz = point_cloud_list[index][skull[RIGHT_PORION]]
+        # left_porion_xyz = point_cloud_list[index][skull[LEFT_PORION]]
+        # naseon_xyz = point_cloud_list[index][skull[NASEON]]
+        # basion_xyz = point_cloud_list[index][skull[BASION]]
     
