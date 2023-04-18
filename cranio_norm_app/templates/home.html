@@ -1,15 +1,49 @@
 {% load static %}
 <html>
     <head>
+        {% load django_bootstrap5 %}
+        {% bootstrap_css %}
+        {% bootstrap_javascript %}
+        {% bootstrap_messages %}
+        <link rel="stylesheet" href="{% static 'style/home.css' %}">
     </head>
     <body>
-        <!-- enctype is needed since we are uploading large file type -->
-        <form action="/cranio/home/" method="post" enctype="multipart/form-data">
-            <!-- needed to bypass security -->
-            {% csrf_token %}
-            {{form}}
-            <input type="submit">
-        </form>
-
+        {% block content %}
+        <div class="page-wrapper">
+            <div class="header-wrapper">
+                <div class="header-text">
+                    <h1>Normative CT Scans</h1>
+                </div>
+                <div class="header-image">
+                    <img src="{% static 'img/uihealth.gif' %}">
+                </div>                
+            </div>
+            <div class="content-wrapper">
+          
+                    <!-- enctype is needed since we are uploading large file type -->
+                    <form action="/cranio/home/" method="post" enctype="multipart/form-data">
+                        <!-- needed to bypass security -->
+                        {% csrf_token %}
+                        <div class="form-wrapper">
+                            
+                            {% for field in form %}
+                                <div class="input-wrapper">
+                                    <div class="label-wrapper">
+                                        <label class="mylabel">{{ field.label }}</label>
+                                    </div>
+                                    <div class="value-wrapper">                    
+                                        {{ field }}
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                        <div class="submit-btn-wrapper">
+                            <input type="submit">
+                        </div>
+                        
+                    </form>
+                         
+            </div>      
+            {% endblock content %}
     </body>
 </html>
