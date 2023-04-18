@@ -24,7 +24,7 @@ let particleMaterial = new THREE.PointsMaterial({
   size: 0.8,
   vertexColors: true,
   transparent: true,
-  opacity: 0,
+  opacity: 0.05,
 });
 
 const controls = new THREE.OrbitControls(camera, renderer.domElement);
@@ -175,7 +175,7 @@ function onClickCanvas(e) {
     if (intersects.length > 0 && pointsList[curIndex].length < 4) {
       // TODO is this index matching that of the data?
       const idx = intersects[0].index;
-      const sphereGeo = new THREE.SphereGeometry(6, 30, 30);
+      const sphereGeo = new THREE.SphereGeometry(3, 30, 30);
       const sphereMat = new THREE.MeshBasicMaterial({ color: 0xffff00 });
       const sphereMesh = new THREE.Mesh(sphereGeo, sphereMat);
       const intersectionPoint = new THREE.Vector3(

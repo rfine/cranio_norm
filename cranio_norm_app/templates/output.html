@@ -1,0 +1,15 @@
+{% load static %}
+<html>
+    <head>
+        <script> var data = "{{data|escapejs}}" </script>
+        <script src="{% static '/lib/jquery-3.6.3.min.js' %}"></script>
+        <script src="{% static '/lib/three.js' %}"></script>     
+        <script src="{% static '/lib/OrbitControls.js' %}"></script>   
+        <script src="{% static '/lib/PLYLoader.js' %}"></script>  
+        <script type="module" src="{% static '/output.js' %}"></script>      
+    </head>
+    <body>
+            <h1>Output</h1>           
+            {% csrf_token %}
+    </body>
+</html>
