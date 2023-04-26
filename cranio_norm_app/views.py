@@ -140,8 +140,8 @@ def doMath(list_of_coords):
         temp.append(coord[1])
         temp.append(coord[2])
         radius1 = math.sqrt(coord[0]**2 + coord[1]**2 + coord[2]**2)
-        phi_rad = divisionPhi(coord[1], coord[0])
-        theta_rad = divisionTheta(coord[2], radius1)
+        phi_rad = math.atan2(coord[1], coord[0])
+        theta_rad = math.acos(coord[2]/radius1)
         phi_deg = math.degrees(phi_rad)
         theta_deg = math.degrees((theta_rad))
         temp.append(radius1)
@@ -149,6 +149,7 @@ def doMath(list_of_coords):
         temp.append(phi_deg)
         returnList.append(temp)
     return (returnList)
+
 # TODO why do we really care about this. Very long runtime
 def forceSigFigs(data, x, y, z):
     for value in data:
