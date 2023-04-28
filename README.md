@@ -8,13 +8,14 @@ A Django web application that allows the user to input skull models in PLY file 
 
 - Clone the repository from the develop branch.
 - Create a new conda enviroment.
-  - `conda create --name ENV_NAME python`
+  - `conda create --name ENV_NAME python=3.10.8`
 - Activiate new conda enviroment.
   - `conda activate ENV_NAME`
 - Navigate to the base of the project in the conda terminal.
 - Execute `pip install -r requirements.txt`
+- Execute `pip install django_bootstrap5`
 - Execute `python manage.py makemigrations`
 - Execute `python manage.py migrate`
 - Start the server by executing `python manage.py runserver`
 - Open brower
-  - EX) http://127.0.0.1:8000/cranio/home/
+  - EX) http://localhost:8000/cranio/home/
